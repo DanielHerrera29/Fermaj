@@ -19,16 +19,11 @@ import {
   Upload,
   Search,
   Bell,
-  ChevronDown,
   TrendingUp,
   TrendingDown,
   Clock,
   CheckCircle,
   AlertCircle,
-  FileText,
-  Calendar,
-  MapPin,
-  Phone,
   MessageSquare,
   Shield,
 } from "lucide-react"
@@ -214,6 +209,7 @@ export default function DashboardPage() {
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 transition-transform`}
+        aria-hidden={!sidebarOpen}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
@@ -224,11 +220,12 @@ export default function DashboardPage() {
               width={120}
               height={40}
               className="h-10 w-auto"
+              priority
             />
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-4 space-y-2" aria-label="Menú de navegación">
             {sidebarItems.map((item) => (
               <Link
                 key={item.label}
@@ -303,6 +300,8 @@ export default function DashboardPage() {
                 size="icon"
                 className="lg:hidden"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label={sidebarOpen ? "Cerrar menú lateral" : "Abrir menú lateral"}
+                aria-expanded={sidebarOpen}
               >
                 {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </Button>
@@ -321,9 +320,10 @@ export default function DashboardPage() {
                 <Input
                   placeholder="Buscar..."
                   className="pl-10 w-64 bg-card"
+                  aria-label="Buscar en el dashboard"
                 />
               </div>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" aria-label="Notificaciones">
                 <Bell className="w-5 h-5" />
               </Button>
             </div>
@@ -398,22 +398,22 @@ export default function DashboardPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">
+                      <th scope="col" className="text-left py-3 px-4 font-medium text-muted-foreground">
                         Orden
                       </th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">
+                      <th scope="col" className="text-left py-3 px-4 font-medium text-muted-foreground">
                         Cliente
                       </th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">
+                      <th scope="col" className="text-left py-3 px-4 font-medium text-muted-foreground">
                         Servicio
                       </th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">
+                      <th scope="col" className="text-left py-3 px-4 font-medium text-muted-foreground">
                         Ciudad
                       </th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">
+                      <th scope="col" className="text-left py-3 px-4 font-medium text-muted-foreground">
                         Estado
                       </th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">
+                      <th scope="col" className="text-left py-3 px-4 font-medium text-muted-foreground">
                         Fecha
                       </th>
                     </tr>
@@ -457,6 +457,9 @@ export default function DashboardPage() {
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
+          onKeyDown={(e) => e.key === "Escape" && setSidebarOpen(false)}
+          role="presentation"
+          aria-hidden="true"
         />
       )}
     </div>

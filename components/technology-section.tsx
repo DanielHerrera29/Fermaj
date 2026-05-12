@@ -46,7 +46,7 @@ const tools = [
 
 export function TechnologySection() {
   return (
-    <section id="tecnologia" className="py-24 bg-background relative overflow-hidden">
+    <section id="tecnologia" className="py-24 bg-background relative overflow-hidden" style={{ contentVisibility: 'auto' }}>
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(200,255,0,0.05),transparent_70%)]" />

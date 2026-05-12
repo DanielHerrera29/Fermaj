@@ -16,7 +16,7 @@ export function ContactSection() {
   }
 
   return (
-    <section id="contacto" className="py-24 bg-secondary/20 relative overflow-hidden">
+    <section id="contacto" className="py-24 bg-secondary/20 relative overflow-hidden" style={{ contentVisibility: 'auto' }}>
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-1/2 h-full bg-[radial-gradient(ellipse_at_top_left,rgba(200,255,0,0.08),transparent_50%)]" />
@@ -124,16 +124,18 @@ export function ContactSection() {
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">Nombre</label>
+                      <label htmlFor="contact-name" className="text-sm font-medium text-foreground mb-2 block">Nombre</label>
                       <Input 
+                        id="contact-name"
                         placeholder="Su nombre completo" 
                         required 
                         className="bg-secondary/50 border-border h-11"
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">Empresa</label>
+                      <label htmlFor="contact-company" className="text-sm font-medium text-foreground mb-2 block">Empresa</label>
                       <Input 
+                        id="contact-company"
                         placeholder="Nombre de la empresa" 
                         className="bg-secondary/50 border-border h-11"
                       />
@@ -141,8 +143,9 @@ export function ContactSection() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">Email</label>
+                      <label htmlFor="contact-email" className="text-sm font-medium text-foreground mb-2 block">Email</label>
                       <Input 
+                        id="contact-email"
                         type="email" 
                         placeholder="correo@empresa.com" 
                         required 
@@ -150,8 +153,9 @@ export function ContactSection() {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">Teléfono</label>
+                      <label htmlFor="contact-phone" className="text-sm font-medium text-foreground mb-2 block">Teléfono</label>
                       <Input 
+                        id="contact-phone"
                         type="tel" 
                         placeholder="+57 300 123 4567" 
                         className="bg-secondary/50 border-border h-11"
@@ -159,8 +163,8 @@ export function ContactSection() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Tipo de Servicio</label>
-                    <select className="w-full h-11 px-3 rounded-md bg-secondary/50 border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <label htmlFor="contact-service" className="text-sm font-medium text-foreground mb-2 block">Tipo de Servicio</label>
+                    <select id="contact-service" className="w-full h-11 px-3 rounded-md bg-secondary/50 border border-border text-foreground text-sm">
                       <option value="">Seleccione un servicio</option>
                       <option value="aires">Aires Acondicionados</option>
                       <option value="televisores">Televisores</option>
@@ -173,8 +177,9 @@ export function ContactSection() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Mensaje</label>
+                    <label htmlFor="contact-message" className="text-sm font-medium text-foreground mb-2 block">Mensaje</label>
                     <Textarea 
+                      id="contact-message"
                       placeholder="Cuéntenos sobre su proyecto o necesidad de instalación..." 
                       rows={4}
                       className="bg-secondary/50 border-border resize-none"

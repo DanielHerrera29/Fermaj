@@ -43,12 +43,14 @@ export function Header() {
                 width={130}
                 height={45}
                 className="h-10 lg:h-11 w-auto relative z-10"
+                priority
+                fetchPriority="high"
               />
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1" aria-label="Navegación principal">
             {navItems.map((item) => (
               <Link
                 key={item.label}
@@ -63,12 +65,12 @@ export function Header() {
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
-            <Link href="/portal">
+            <Link href="/portal" aria-label="Ir al portal de clientes">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                 Portal Clientes
               </Button>
             </Link>
-            <Link href="#contacto">
+            <Link href="#contacto" aria-label="Solicitar cotización">
               <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all">
                 Cotizar
                 <ChevronRight className="w-4 h-4" />
@@ -78,8 +80,10 @@ export function Header() {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2 text-foreground rounded-lg hover:bg-secondary transition-colors"
+            className="lg:hidden p-2 text-foreground rounded-lg hover:bg-secondary transition-colors focus-visible:outline-2 focus-visible:outline-primary"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -91,7 +95,7 @@ export function Header() {
         mobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
       }`}>
         <div className="bg-background/95 backdrop-blur-lg border-t border-border">
-          <nav className="flex flex-col px-4 py-4 gap-1">
+          <nav className="flex flex-col px-4 py-4 gap-1" aria-label="Navegación móvil">
             {navItems.map((item) => (
               <Link
                 key={item.label}
@@ -103,12 +107,12 @@ export function Header() {
               </Link>
             ))}
             <div className="flex flex-col gap-2 pt-4 mt-2 border-t border-border">
-              <Link href="/portal" onClick={() => setMobileMenuOpen(false)}>
+              <Link href="/portal" onClick={() => setMobileMenuOpen(false)} aria-label="Ir al portal de clientes">
                 <Button variant="outline" size="sm" className="w-full">
                   Portal Clientes
                 </Button>
               </Link>
-              <Link href="#contacto" onClick={() => setMobileMenuOpen(false)}>
+              <Link href="#contacto" onClick={() => setMobileMenuOpen(false)} aria-label="Solicitar cotización">
                 <Button size="sm" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
                   Cotizar
                 </Button>

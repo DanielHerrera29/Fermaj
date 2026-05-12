@@ -35,7 +35,7 @@ export function ServicesSection() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   return (
-    <section id="servicios" className="py-24 bg-secondary/20 relative overflow-hidden">
+    <section id="servicios" className="py-24 bg-secondary/20 relative overflow-hidden" style={{ contentVisibility: 'auto' }}>
       {/* Background Pattern */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(200,255,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(200,255,0,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />

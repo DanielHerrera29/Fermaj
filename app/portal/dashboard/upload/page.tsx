@@ -299,12 +299,12 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 transition-transform`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 transition-transform`} aria-hidden={!sidebarOpen}>
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-border">
             <Image src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-4yX0MySL8JwRWLy6HNVo15DHVDqngh.png" alt="Fermaj Logo" width={120} height={40} className="h-10 w-auto" />
           </div>
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-4 space-y-2" aria-label="Menú de navegación">
             {sidebarItems.map((item) => (
               <Link key={item.label} href={item.href} className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${item.active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}>
                 <item.icon className="w-5 h-5" />
@@ -343,7 +343,7 @@ export default function UploadPage() {
         <header className="sticky top-0 z-40 bg-background border-b border-border">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
+              <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label={sidebarOpen ? "Cerrar menú lateral" : "Abrir menú lateral"} aria-expanded={sidebarOpen}>
                 {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </Button>
               <div>
@@ -371,7 +371,7 @@ export default function UploadPage() {
               onClick={() => fileRef.current?.click()}
               className={`relative flex flex-col items-center justify-center border-2 border-dashed rounded-2xl p-16 cursor-pointer transition-all ${dragOver ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-border hover:border-blue-400 hover:bg-secondary/50"}`}
             >
-              <input ref={fileRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={onFileChange} />
+              <input ref={fileRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={onFileChange} aria-label="Seleccionar archivo Excel" />
               {stage === "parsing" ? (
                 <div className="flex flex-col items-center gap-3">
                   <Loader2 className="w-10 h-10 animate-spin text-primary" />
@@ -420,7 +420,7 @@ export default function UploadPage() {
                     <thead>
                       <tr className="bg-secondary border-b border-border">
                         {["NUI", "Cliente", "Teléfono", "Ciudad", "Tipo", "Prioridad"].map(h => (
-                          <th key={h} className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase">{h}</th>
+                          <th key={h} scope="col" className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase">{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -511,7 +511,7 @@ export default function UploadPage() {
         </main>
       </div>
 
-      {sidebarOpen && <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+      {sidebarOpen && <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} onKeyDown={(e) => e.key === "Escape" && setSidebarOpen(false)} role="presentation" aria-hidden="true" />}
     </div>
   )
 }

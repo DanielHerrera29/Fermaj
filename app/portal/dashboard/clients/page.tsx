@@ -201,6 +201,7 @@ export default function ClientsPage() {
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
+        aria-hidden={!sidebarOpen}
       >
         <div className="flex flex-col h-full">
           <div className="p-4 border-b border-border flex items-center justify-between">
@@ -216,12 +217,13 @@ export default function ClientsPage() {
             <button
               onClick={() => setSidebarOpen(false)}
               className="lg:hidden p-1 text-muted-foreground hover:text-foreground"
+              aria-label="Cerrar menú lateral"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <nav className="flex-1 p-4">
+          <nav className="flex-1 p-4" aria-label="Menú de navegación">
             <ul className="space-y-2">
               {sidebarItems.map((item) => (
                 <li key={item.label}>
@@ -279,6 +281,7 @@ export default function ClientsPage() {
               <button
                 onClick={() => setSidebarOpen(true)}
                 className="lg:hidden p-2 text-muted-foreground hover:text-foreground"
+                aria-label="Abrir menú lateral"
               >
                 <Menu className="w-5 h-5" />
               </button>
@@ -385,7 +388,8 @@ export default function ClientsPage() {
                       <button 
                         className={`p-1 ${isSuperadmin ? 'text-muted-foreground hover:text-foreground cursor-pointer' : 'text-muted-foreground/50 cursor-not-allowed'}`}
                         onClick={() => isSuperadmin && handleToggleActive(userData)}
-                        title={isSuperadmin ? "Menú" : "Solo disponible para superadmin"}
+                        aria-label={isSuperadmin ? `Cambiar estado de ${userData.name}` : "Solo disponible para superadmin"}
+                        disabled={!isSuperadmin}
                       >
                         <MoreVertical className="w-4 h-4" />
                       </button>
@@ -458,10 +462,11 @@ export default function ClientsPage() {
             <CardContent>
               <form onSubmit={handleCreate} className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
+                  <label htmlFor="create-user-name" className="text-sm font-medium text-foreground mb-2 block">
                     Nombre
                   </label>
                   <Input
+                    id="create-user-name"
                     placeholder="Juan Perez"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -469,10 +474,11 @@ export default function ClientsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
+                  <label htmlFor="create-user-email" className="text-sm font-medium text-foreground mb-2 block">
                     Email
                   </label>
                   <Input
+                    id="create-user-email"
                     type="email"
                     placeholder="juan@empresa.com"
                     value={formData.email}
@@ -481,10 +487,11 @@ export default function ClientsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
+                  <label htmlFor="create-user-password" className="text-sm font-medium text-foreground mb-2 block">
                     Contraseña
                   </label>
                   <Input
+                    id="create-user-password"
                     type="password"
                     placeholder="••••••••"
                     value={formData.password}
@@ -494,10 +501,11 @@ export default function ClientsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
+                  <label htmlFor="create-user-company" className="text-sm font-medium text-foreground mb-2 block">
                     Empresa
                   </label>
                   <select
+                    id="create-user-company"
                     className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground"
                     value={formData.company}
                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
@@ -512,10 +520,11 @@ export default function ClientsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
+                  <label htmlFor="create-user-role" className="text-sm font-medium text-foreground mb-2 block">
                     Rol
                   </label>
                   <select
+                    id="create-user-role"
                     className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground"
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
@@ -524,7 +533,7 @@ export default function ClientsPage() {
                     <option value="admin">Administrador</option>
                   </select>
                 </div>
-                {formError && <p className="text-sm text-red-500">{formError}</p>}
+                {formError && <p className="text-sm text-red-500" role="alert">{formError}</p>}
                 <div className="flex gap-3 pt-2">
                   <Button
                     type="button"
@@ -557,6 +566,9 @@ export default function ClientsPage() {
         <div
           className="fixed inset-0 bg-background/80 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
+          onKeyDown={(e) => e.key === "Escape" && setSidebarOpen(false)}
+          role="presentation"
+          aria-hidden="true"
         />
       )}
     </div>

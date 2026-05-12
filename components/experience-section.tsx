@@ -84,7 +84,7 @@ export function ExperienceSection() {
   }, [])
 
   return (
-    <section id="experiencia" className="py-24 bg-background relative overflow-hidden">
+    <section id="experiencia" className="py-24 bg-background relative overflow-hidden" style={{ contentVisibility: 'auto' }}>
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-[radial-gradient(ellipse_at_top_right,rgba(200,255,0,0.08),transparent_60%)]" />
@@ -139,6 +139,8 @@ export function ExperienceSection() {
                   width={800}
                   height={600}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
               </div>

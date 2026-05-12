@@ -235,6 +235,7 @@ export default function ChatbotReportPage() {
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 transition-transform`}
+        aria-hidden={!sidebarOpen}
       >
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-border">
@@ -246,7 +247,7 @@ export default function ChatbotReportPage() {
               className="h-10 w-auto"
             />
           </div>
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-4 space-y-2" aria-label="Menú de navegación">
             <Link
               href="/portal/dashboard"
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
@@ -322,7 +323,7 @@ export default function ChatbotReportPage() {
         <header className="sticky top-0 z-40 bg-background border-b border-border">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-4">
-              <Link href="/portal/dashboard">
+              <Link href="/portal/dashboard" aria-label="Volver al dashboard">
                 <Button variant="ghost" size="icon">
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
@@ -336,7 +337,9 @@ export default function ChatbotReportPage() {
                 </p>
               </div>
             </div>
+            <label htmlFor="filter-chat-estado" className="sr-only">Filtrar por estado</label>
             <select
+              id="filter-chat-estado"
               className="px-3 py-2 border rounded-md"
               value={filterEstado}
               onChange={(e) => {
@@ -496,6 +499,9 @@ export default function ChatbotReportPage() {
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
+          onKeyDown={(e) => e.key === "Escape" && setSidebarOpen(false)}
+          role="presentation"
+          aria-hidden="true"
         />
       )}
     </div>

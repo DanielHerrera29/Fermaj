@@ -71,7 +71,7 @@ export default function NosotrosPage() {
       </section>
 
       {/* History */}
-      <section className="py-24 bg-background">
+      <section className="py-24 bg-background" style={{ contentVisibility: 'auto' }}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -98,6 +98,8 @@ export default function NosotrosPage() {
                 alt="Equipo Fermaj"
                 fill
                 className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                loading="lazy"
               />
             </div>
           </div>
@@ -105,7 +107,7 @@ export default function NosotrosPage() {
       </section>
 
       {/* Values */}
-      <section className="py-24 bg-secondary/30">
+      <section className="py-24 bg-secondary/30" style={{ contentVisibility: 'auto' }}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-foreground mb-4">Nuestros Valores</h2>
@@ -128,7 +130,7 @@ export default function NosotrosPage() {
       </section>
 
       {/* Team */}
-      <section className="py-24 bg-background">
+      <section className="py-24 bg-background" style={{ contentVisibility: 'auto' }}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-foreground mb-4">Equipo Directivo</h2>
@@ -145,6 +147,8 @@ export default function NosotrosPage() {
                     alt={member.name}
                     fill
                     className="object-cover"
+                    sizes="160px"
+                    loading="lazy"
                   />
                 </div>
                 <h3 className="font-semibold text-foreground">{member.name}</h3>
@@ -156,7 +160,7 @@ export default function NosotrosPage() {
       </section>
 
       {/* Certifications */}
-      <section className="py-24 bg-secondary/30">
+      <section className="py-24 bg-secondary/30" style={{ contentVisibility: 'auto' }}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>

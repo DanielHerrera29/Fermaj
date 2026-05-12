@@ -70,6 +70,8 @@ export default function PortalLoginPage() {
               width={140}
               height={50}
               className="h-12 w-auto"
+              priority
+              fetchPriority="high"
             />
           </div>
 
@@ -86,38 +88,44 @@ export default function PortalLoginPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
+              <label htmlFor="login-email" className="text-sm font-medium text-foreground mb-2 block">
                 Correo Electrónico
               </label>
               <Input
+                id="login-email"
                 type="email"
                 name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="correo@empresa.com"
                 required
+                autoComplete="email"
                 className="bg-card border-border h-11"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
+              <label htmlFor="login-password" className="text-sm font-medium text-foreground mb-2 block">
                 Contraseña
               </label>
               <div className="relative">
                 <Input
+                  id="login-password"
                   type={showPassword ? "text" : "password"}
                   name="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
+                  autoComplete="current-password"
                   className="bg-card border-border h-11 pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary rounded"
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  aria-pressed={showPassword}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -125,15 +133,15 @@ export default function PortalLoginPage() {
             </div>
 
             {error && (
-              <p className="text-sm text-destructive">{error}</p>
+              <p className="text-sm text-destructive" role="alert">{error}</p>
             )}
 
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="rounded border-border" />
+                <input type="checkbox" className="rounded border-border" aria-label="Recordarme" />
                 <span className="text-sm text-muted-foreground">Recordarme</span>
               </label>
-              <Link href="#" className="text-sm text-primary hover:underline">
+              <Link href="#" className="text-sm text-primary hover:underline" aria-label="Recuperar contraseña">
                 Olvidé mi contraseña
               </Link>
             </div>

@@ -1,11 +1,11 @@
 "use client"
 
-import { MapPin, Check, TrendingUp } from "lucide-react"
+import { MapPin, Check } from "lucide-react"
 
 const cities = [
-  { name: "Bogotá", region: "Cundinamarca", status: "Operativo" },
-  { name: "Medellín", region: "Antioquia", status: "Operativo" },
-  { name: "Cali", region: "Valle del Cauca", status: "Operativo" },
+  { name: "Bogotá", region: "Cundinamarca", status: "Operativo", technicians: 10 },
+  { name: "Medellín", region: "Antioquia", status: "Operativo", technicians: 8 },
+  { name: "Cali", region: "Valle del Cauca", status: "Operativo", technicians: 6 },
 ]
 
 const features = [

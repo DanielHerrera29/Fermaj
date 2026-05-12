@@ -17,9 +17,9 @@ const footerLinks = {
     { label: "Portal Clientes", href: "/portal" },
   ],
   legal: [
-    { label: "Términos y Condiciones", href: "#" },
-    { label: "Política de Privacidad", href: "#" },
-    { label: "Tratamiento de Datos", href: "#" },
+    { label: "Términos y Condiciones", href: "#terminos" },
+    { label: "Política de Privacidad", href: "#privacidad" },
+    { label: "Tratamiento de Datos", href: "#datos" },
   ],
 }
 
@@ -37,6 +37,7 @@ export function Footer() {
                 width={120}
                 height={40}
                 className="h-10 w-auto"
+                loading="lazy"
               />
             </Link>
             <p className="text-sm text-muted-foreground mb-4">
@@ -108,23 +109,20 @@ export function Footer() {
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">Síguenos:</span>
             <div className="flex items-center gap-2">
-              <a href="#" className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-primary/20 transition-colors">
-                <span className="sr-only">Facebook</span>
-                <svg className="w-4 h-4 text-foreground" fill="currentColor" viewBox="0 0 24 24">
+              <a href="#" className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-primary/20 transition-colors" aria-label="Síguenos en Facebook" title="Facebook">
+                <svg className="w-4 h-4 text-foreground" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                 </svg>
               </a>
-              <a href="#" className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-primary/20 transition-colors">
-                <span className="sr-only">Instagram</span>
-                <svg className="w-4 h-4 text-foreground" fill="currentColor" viewBox="0 0 24 24">
+              <a href="#" className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-primary/20 transition-colors" aria-label="Síguenos en Instagram" title="Instagram">
+                <svg className="w-4 h-4 text-foreground" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="currentColor" strokeWidth="2"/>
                   <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2"/>
                   <circle cx="18" cy="6" r="1"/>
                 </svg>
               </a>
-              <a href="#" className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-primary/20 transition-colors">
-                <span className="sr-only">LinkedIn</span>
-                <svg className="w-4 h-4 text-foreground" fill="currentColor" viewBox="0 0 24 24">
+              <a href="#" className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-primary/20 transition-colors" aria-label="Síguenos en LinkedIn" title="LinkedIn">
+                <svg className="w-4 h-4 text-foreground" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
                   <rect x="2" y="9" width="4" height="12"/>
                   <circle cx="4" cy="4" r="2"/>

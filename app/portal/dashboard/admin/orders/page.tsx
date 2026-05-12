@@ -97,7 +97,7 @@ function OrderForm({ order, onSave, onCancel }: {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.nui || !form.direccion || !form.tecnico) {
-      alert("Campos obligatorios: nui, direccion, tecnico")
+      alert("Campos obligatorios: NUI, dirección y técnico")
       return
     }
     setSaving(true)
@@ -109,40 +109,41 @@ function OrderForm({ order, onSave, onCancel }: {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium">NUI *</label>
-          <Input value={form.nui || ""} onChange={(e) => handleChange("nui", e.target.value)} required />
+          <label htmlFor="form-nui" className="text-sm font-medium">NUI *</label>
+          <Input id="form-nui" value={form.nui || ""} onChange={(e) => handleChange("nui", e.target.value)} required />
         </div>
         <div>
-          <label className="text-sm font-medium">Número de Orden</label>
-          <Input value={form.numero_orden || ""} onChange={(e) => handleChange("numero_orden", e.target.value)} />
+          <label htmlFor="form-numero-orden" className="text-sm font-medium">Número de Orden</label>
+          <Input id="form-numero-orden" value={form.numero_orden || ""} onChange={(e) => handleChange("numero_orden", e.target.value)} />
         </div>
         <div>
-          <label className="text-sm font-medium">Cliente</label>
-          <Input value={form.nombre_cliente || ""} onChange={(e) => handleChange("nombre_cliente", e.target.value)} />
+          <label htmlFor="form-cliente" className="text-sm font-medium">Cliente</label>
+          <Input id="form-cliente" value={form.nombre_cliente || ""} onChange={(e) => handleChange("nombre_cliente", e.target.value)} />
         </div>
         <div>
-          <label className="text-sm font-medium">Teléfono</label>
-          <Input value={form.telefono || ""} onChange={(e) => handleChange("telefono", e.target.value)} />
+          <label htmlFor="form-telefono" className="text-sm font-medium">Teléfono</label>
+          <Input id="form-telefono" value={form.telefono || ""} onChange={(e) => handleChange("telefono", e.target.value)} />
         </div>
         <div className="md:col-span-2">
-          <label className="text-sm font-medium">Dirección *</label>
-          <Input value={form.direccion || ""} onChange={(e) => handleChange("direccion", e.target.value)} required />
+          <label htmlFor="form-direccion" className="text-sm font-medium">Dirección *</label>
+          <Input id="form-direccion" value={form.direccion || ""} onChange={(e) => handleChange("direccion", e.target.value)} required />
         </div>
         <div>
-          <label className="text-sm font-medium">Ciudad</label>
-          <Input value={form.ciudad || ""} onChange={(e) => handleChange("ciudad", e.target.value)} />
+          <label htmlFor="form-ciudad" className="text-sm font-medium">Ciudad</label>
+          <Input id="form-ciudad" value={form.ciudad || ""} onChange={(e) => handleChange("ciudad", e.target.value)} />
         </div>
         <div>
-          <label className="text-sm font-medium">Modelo</label>
-          <Input value={form.modelo || ""} onChange={(e) => handleChange("modelo", e.target.value)} />
+          <label htmlFor="form-modelo" className="text-sm font-medium">Modelo</label>
+          <Input id="form-modelo" value={form.modelo || ""} onChange={(e) => handleChange("modelo", e.target.value)} />
         </div>
         <div>
-          <label className="text-sm font-medium">Técnico *</label>
-          <Input value={form.tecnico || ""} onChange={(e) => handleChange("tecnico", e.target.value)} required />
+          <label htmlFor="form-tecnico" className="text-sm font-medium">Técnico *</label>
+          <Input id="form-tecnico" value={form.tecnico || ""} onChange={(e) => handleChange("tecnico", e.target.value)} required />
         </div>
         <div>
-          <label className="text-sm font-medium">Estado</label>
+          <label htmlFor="form-estado" className="text-sm font-medium">Estado</label>
           <select
+            id="form-estado"
             value={form.estado || "pendiente"}
             onChange={(e) => handleChange("estado", e.target.value)}
             className="w-full h-10 px-3 rounded-md bg-background border border-border text-foreground text-sm"
@@ -153,12 +154,12 @@ function OrderForm({ order, onSave, onCancel }: {
           </select>
         </div>
         <div>
-          <label className="text-sm font-medium">Plataforma</label>
-          <Input value={form.plataforma || ""} onChange={(e) => handleChange("plataforma", e.target.value)} />
+          <label htmlFor="form-plataforma" className="text-sm font-medium">Plataforma</label>
+          <Input id="form-plataforma" value={form.plataforma || ""} onChange={(e) => handleChange("plataforma", e.target.value)} />
         </div>
         <div className="md:col-span-2">
-          <label className="text-sm font-medium">Novedad</label>
-          <Input value={form.novedad || ""} onChange={(e) => handleChange("novedad", e.target.value)} />
+          <label htmlFor="form-novedad" className="text-sm font-medium">Novedad</label>
+          <Input id="form-novedad" value={form.novedad || ""} onChange={(e) => handleChange("novedad", e.target.value)} />
         </div>
       </div>
 
@@ -312,7 +313,7 @@ export default function AdminOrdersPage() {
   }
 
   const SortHeader = ({ field, label }: { field: string; label: string }) => (
-    <button onClick={() => toggleSort(field)} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                <button onClick={() => toggleSort(field)} className="flex items-center gap-1 hover:text-foreground transition-colors" aria-label={`Ordenar por ${label}${sortField === field ? ` (${sortOrder === "asc" ? "ascendente" : "descendente"})` : ""}`}>
       {label}
       <ArrowUpDown className={`w-3 h-3 ${sortField === field ? "text-primary" : "opacity-50"}`} />
     </button>
@@ -350,6 +351,7 @@ export default function AdminOrdersPage() {
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 transition-transform`}
+        aria-hidden={!sidebarOpen}
       >
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-border">
@@ -361,7 +363,7 @@ export default function AdminOrdersPage() {
               className="h-10 w-auto"
             />
           </div>
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-4 space-y-2" aria-label="Menú de navegación">
             {sidebarItems.map((item) => (
               <Link
                 key={item.label}
@@ -408,7 +410,7 @@ export default function AdminOrdersPage() {
         <header className="sticky top-0 z-40 bg-background border-b border-border">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
+              <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label={sidebarOpen ? "Cerrar menú lateral" : "Abrir menú lateral"} aria-expanded={sidebarOpen}>
                 {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </Button>
               <div>
@@ -437,7 +439,9 @@ export default function AdminOrdersPage() {
                     className="pl-9"
                   />
                 </div>
+                <label htmlFor="admin-filter-estado" className="sr-only">Filtrar por estado</label>
                 <select
+                  id="admin-filter-estado"
                   value={filtroEstado}
                   onChange={(e) => { setFiltroEstado(e.target.value); setPage(1) }}
                   className="h-10 px-3 rounded-md bg-background border border-border text-foreground text-sm min-w-[140px]"
@@ -447,19 +451,25 @@ export default function AdminOrdersPage() {
                     <option key={e} value={e}>{e.replace("_", " ")}</option>
                   ))}
                 </select>
+                <label htmlFor="admin-filter-ciudad" className="sr-only">Filtrar por ciudad</label>
                 <Input
+                  id="admin-filter-ciudad"
                   placeholder="Ciudad..."
                   value={filtroCiudad}
                   onChange={(e) => { setFiltroCiudad(e.target.value); setPage(1) }}
                   className="min-w-[120px]"
                 />
+                <label htmlFor="admin-filter-tecnico" className="sr-only">Filtrar por técnico</label>
                 <Input
+                  id="admin-filter-tecnico"
                   placeholder="Técnico..."
                   value={filtroTecnico}
                   onChange={(e) => { setFiltroTecnico(e.target.value); setPage(1) }}
                   className="min-w-[120px]"
                 />
+                <label htmlFor="admin-filter-numero" className="sr-only">Filtrar por número de orden</label>
                 <Input
+                  id="admin-filter-numero"
                   placeholder="N. Orden..."
                   value={filtroNumeroOrden}
                   onChange={(e) => { setFiltroNumeroOrden(e.target.value); setPage(1) }}
@@ -492,17 +502,17 @@ export default function AdminOrdersPage() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-border text-xs text-muted-foreground uppercase">
-                        <th className="text-left py-3 px-4"><SortHeader field="id" label="ID" /></th>
-                        <th className="text-left py-3 px-4"><SortHeader field="numero_orden" label="N. Orden" /></th>
-                        <th className="text-left py-3 px-4"><SortHeader field="nombre_cliente" label="Cliente" /></th>
-                        <th className="text-left py-3 px-4"><SortHeader field="nui" label="NUI" /></th>
-                        <th className="text-left py-3 px-4"><SortHeader field="direccion" label="Dirección" /></th>
-                        <th className="text-left py-3 px-4"><SortHeader field="ciudad" label="Ciudad" /></th>
-                        <th className="text-left py-3 px-4">Teléfono</th>
-                        <th className="text-left py-3 px-4"><SortHeader field="tecnico" label="Técnico" /></th>
-                        <th className="text-left py-3 px-4"><SortHeader field="estado" label="Estado" /></th>
-                        <th className="text-left py-3 px-4"><SortHeader field="created_at" label="Creado" /></th>
-                        <th className="text-right py-3 px-4">Acciones</th>
+                        <th scope="col" className="text-left py-3 px-4"><SortHeader field="id" label="ID" /></th>
+                        <th scope="col" className="text-left py-3 px-4"><SortHeader field="numero_orden" label="N. Orden" /></th>
+                        <th scope="col" className="text-left py-3 px-4"><SortHeader field="nombre_cliente" label="Cliente" /></th>
+                        <th scope="col" className="text-left py-3 px-4"><SortHeader field="nui" label="NUI" /></th>
+                        <th scope="col" className="text-left py-3 px-4"><SortHeader field="direccion" label="Dirección" /></th>
+                        <th scope="col" className="text-left py-3 px-4"><SortHeader field="ciudad" label="Ciudad" /></th>
+                        <th scope="col" className="text-left py-3 px-4">Teléfono</th>
+                        <th scope="col" className="text-left py-3 px-4"><SortHeader field="tecnico" label="Técnico" /></th>
+                        <th scope="col" className="text-left py-3 px-4"><SortHeader field="estado" label="Estado" /></th>
+                        <th scope="col" className="text-left py-3 px-4"><SortHeader field="created_at" label="Creado" /></th>
+                        <th scope="col" className="text-right py-3 px-4">Acciones</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -526,6 +536,7 @@ export default function AdminOrdersPage() {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => { setSelectedOrder(order); setShowEditModal(true) }}
+                                aria-label={`Editar orden ${order.nui}`}
                               >
                                 <Pencil className="w-4 h-4" />
                               </Button>
@@ -534,6 +545,7 @@ export default function AdminOrdersPage() {
                                 variant="ghost"
                                 className="text-red-500 hover:text-red-600"
                                 onClick={() => setDeleteTarget(order)}
+                                aria-label={`Eliminar orden ${order.nui}`}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
@@ -624,7 +636,7 @@ export default function AdminOrdersPage() {
       </AlertDialog>
 
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} onKeyDown={(e) => e.key === "Escape" && setSidebarOpen(false)} role="presentation" aria-hidden="true" />
       )}
     </div>
   )
