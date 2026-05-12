@@ -1,10 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Play, CheckCircle2 } from "lucide-react"
+import { ArrowRight, Play, CheckCircle2, Zap } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 
 export function HeroSection() {
   return (
@@ -91,14 +90,13 @@ export function HeroSection() {
               {/* Glow Effect */}
               <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-75" />
               
-              {/* Main Lottie */}
+              {/* Main Illustration */}
               <div className="relative bg-card/50 backdrop-blur-sm rounded-3xl border border-border p-8 shadow-2xl">
-                <DotLottieReact
-                  src="https://lottie.host/f6ebe8a7-67ed-4c15-bca6-79a3adcf33c5/5VdXfuhb1J.lottie"
-                  loop
-                  autoplay
-                  className="w-full h-auto"
-                />
+                <div className="w-full aspect-square flex items-center justify-center">
+                  <div className="w-40 h-40 rounded-full bg-gradient-to-br from-primary/30 via-primary/10 to-secondary flex items-center justify-center animate-pulse">
+                    <Zap className="w-20 h-20 text-primary" />
+                  </div>
+                </div>
               </div>
 
               {/* Floating Stats Card */}

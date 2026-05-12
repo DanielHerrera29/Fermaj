@@ -4,8 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Mail, Phone, MapPin, Send, CheckCircle, MessageCircle, Clock } from "lucide-react"
-import { DotLottieReact } from "@lottiefiles/dotlottie-react"
+import { Mail, Phone, MapPin, Send, CheckCircle, MessageCircle, Clock, MessageSquare } from "lucide-react"
 
 export function ContactSection() {
   const [submitted, setSubmitted] = useState(false)
@@ -44,13 +43,10 @@ export function ContactSection() {
           {/* Contact Info */}
           <div>
             {/* Lottie Animation */}
-            <div className="mb-8 max-w-sm mx-auto lg:mx-0">
-              <DotLottieReact
-                src="https://lottie.host/dc5bed9b-ec9c-4b37-b0aa-7e3d8bb0c00e/k9WRrM6lOW.lottie"
-                loop
-                autoplay
-                className="w-full"
-              />
+            <div className="mb-8 max-w-sm mx-auto lg:mx-0 flex justify-center">
+              <div className="w-40 h-40 rounded-3xl bg-gradient-to-br from-primary/20 via-primary/10 to-secondary flex items-center justify-center shadow-xl">
+                <MessageSquare className="w-20 h-20 text-primary" />
+              </div>
             </div>
 
             {/* Contact Cards */}

@@ -6,8 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Eye, EyeOff, ArrowLeft } from "lucide-react"
-import { DotLottieReact } from "@lottiefiles/dotlottie-react"
+import { Eye, EyeOff, ArrowLeft, ClipboardList, TrendingUp, Shield } from "lucide-react"
 
 export default function PortalLoginPage() {
   const router = useRouter()
@@ -22,19 +21,29 @@ export default function PortalLoginPage() {
     setIsLoading(true)
     setError("")
 
-    // Simulate authentication
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
 
-    if (email && password) {
-      // Store demo session
-      localStorage.setItem("fermaj_session", JSON.stringify({ 
-        email, 
-        name: "Cliente Demo",
-        company: "Empresa Demo S.A.S."
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || "Error al iniciar sesión")
+        setIsLoading(false)
+        return
+      }
+
+      localStorage.setItem("fermaj_session", JSON.stringify({
+        ...data.user,
+        token: data.session?.token,
       }))
+
       router.push("/portal/dashboard")
-    } else {
-      setError("Por favor ingrese sus credenciales")
+    } catch {
+      setError("Error de conexión")
       setIsLoading(false)
     }
   }
@@ -137,13 +146,6 @@ export default function PortalLoginPage() {
               {isLoading ? "Ingresando..." : "Ingresar"}
             </Button>
           </form>
-
-          {/* Demo Notice */}
-          <div className="mt-8 p-4 rounded-lg bg-secondary/50 border border-border">
-            <p className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Modo Demo:</strong> Ingrese cualquier correo y contraseña para acceder al portal.
-            </p>
-          </div>
         </div>
       </div>
 
@@ -153,12 +155,11 @@ export default function PortalLoginPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(200,255,0,0.05),transparent_50%)]" />
         
         <div className="relative z-10 w-full max-w-lg px-8">
-          <DotLottieReact
-            src="https://lottie.host/4db68bbd-31f6-4cd8-84eb-189571aa9c10/7SwMGdv3hC.lottie"
-            loop
-            autoplay
-            className="w-full"
-          />
+          <div className="flex items-center justify-center">
+            <div className="w-48 h-48 rounded-3xl bg-gradient-to-br from-primary/20 via-primary/10 to-secondary flex items-center justify-center shadow-2xl">
+              <ClipboardList className="w-24 h-24 text-primary" />
+            </div>
+          </div>
           
           <div className="mt-8 text-center">
             <h2 className="text-2xl font-bold text-foreground mb-3">

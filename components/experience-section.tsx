@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { DotLottieReact } from "@lottiefiles/dotlottie-react"
+import { Award } from "lucide-react"
 import { useRef, useEffect, useState } from "react"
 
 const partners = [
@@ -169,13 +169,10 @@ export function ExperienceSection() {
           <div className="relative grid grid-cols-1 lg:grid-cols-5 gap-8 p-8 lg:p-12 rounded-3xl border border-border bg-card/50 backdrop-blur-sm">
             {/* Lottie Animation */}
             <div className="lg:col-span-1 flex items-center justify-center">
-              <div className="w-32 h-32">
-                <DotLottieReact
-                  src="https://lottie.host/7d0b3e7e-c9d4-45dd-b89a-ea49c0def1ca/vJRE9HuBqS.lottie"
-                  loop
-                  autoplay
-                  className="w-full h-full"
-                />
+              <div className="w-32 h-32 flex items-center justify-center">
+                <div className="w-28 h-28 rounded-full bg-gradient-to-br from-primary/20 via-primary/10 to-secondary flex items-center justify-center shadow-xl">
+                  <Award className="w-14 h-14 text-primary" />
+                </div>
               </div>
             </div>
 

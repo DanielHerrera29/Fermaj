@@ -1,7 +1,6 @@
 "use client"
 
-import { Smartphone, Cloud, BarChart3, Shield, Clock, Headphones } from "lucide-react"
-import { DotLottieReact } from "@lottiefiles/dotlottie-react"
+import { Smartphone, Cloud, BarChart3, Shield, Clock, Headphones, Smartphone as SmartphoneIcon } from "lucide-react"
 
 const technologies = [
   {
@@ -120,12 +119,11 @@ export function TechnologySection() {
             <div className="relative">
               <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-full scale-75" />
               <div className="relative bg-secondary/50 rounded-2xl p-6 border border-border">
-                <DotLottieReact
-                  src="https://lottie.host/e59e8b0a-a773-4c66-b829-6c37383c3dc5/7lrTHVMjPk.lottie"
-                  loop
-                  autoplay
-                  className="w-full h-auto"
-                />
+                <div className="w-full aspect-square flex items-center justify-center">
+                  <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary flex items-center justify-center shadow-lg">
+                    <SmartphoneIcon className="w-16 h-16 text-primary" />
+                  </div>
+                </div>
                 <div className="mt-4 text-center">
                   <p className="font-semibold text-foreground">App Fermaj Técnicos</p>
                   <p className="text-sm text-muted-foreground">Disponible en iOS y Android</p>

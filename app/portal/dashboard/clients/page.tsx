@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -18,100 +18,180 @@ import {
   X,
   Search,
   Plus,
-  Phone,
-  Mail,
-  MapPin,
-  Building,
   MoreVertical,
+  CheckCircle,
+  XCircle,
+  Loader2,
+  User,
+  Shield,
 } from "lucide-react"
+import { getMe } from "@/app/Services/api"
+
+interface UserData {
+  id: string
+  name: string
+  email: string
+  role: string
+  active: boolean
+  organization_id: string
+  organization_name: string
+  created_at: string
+}
+
+const COMPANY_STYLES: Record<string, string> = {
+  samsung: "border-blue-500",
+  lg: "border-red-500",
+  compuspar: "border-red-600",
+}
+
+const COMPANIES = [
+  { id: "samsung", name: "Samsung", color: "#1428A0" },
+  { id: "lg", name: "LG", color: "#A50034" },
+  { id: "compuspar", name: "Compuspar", color: "#E31837" },
+]
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/portal/dashboard" },
   { icon: FileSpreadsheet, label: "Subir Excel", href: "/portal/dashboard/upload" },
   { icon: ClipboardList, label: "Órdenes", href: "/portal/dashboard/orders" },
-  { icon: Users, label: "Clientes", href: "/portal/dashboard/clients", active: true },
   { icon: Settings, label: "Configuración", href: "/portal/dashboard/settings" },
 ]
 
-const clients = [
-  {
-    id: "CLI-001",
-    name: "María García",
-    email: "maria.garcia@email.com",
-    phone: "+57 315 123 4567",
-    city: "Bogotá",
-    address: "Calle 123 #45-67, Chapinero",
-    orders: 5,
-    lastOrder: "2024-01-15",
-  },
-  {
-    id: "CLI-002",
-    name: "Carlos López",
-    email: "carlos.lopez@email.com",
-    phone: "+57 310 987 6543",
-    city: "Medellín",
-    address: "Carrera 70 #50-30, El Poblado",
-    orders: 3,
-    lastOrder: "2024-01-15",
-  },
-  {
-    id: "CLI-003",
-    name: "Ana Martínez",
-    email: "ana.martinez@email.com",
-    phone: "+57 320 456 7890",
-    city: "Cali",
-    address: "Avenida 6N #25-50, Granada",
-    orders: 2,
-    lastOrder: "2024-01-14",
-  },
-  {
-    id: "CLI-004",
-    name: "Pedro Ramírez",
-    email: "pedro.ramirez@email.com",
-    phone: "+57 318 234 5678",
-    city: "Barranquilla",
-    address: "Calle 84 #51-20, Alto Prado",
-    orders: 8,
-    lastOrder: "2024-01-14",
-  },
-  {
-    id: "CLI-005",
-    name: "Laura Sánchez",
-    email: "laura.sanchez@email.com",
-    phone: "+57 300 567 8901",
-    city: "Bogotá",
-    address: "Calle 100 #15-20, Usaquén",
-    orders: 1,
-    lastOrder: "2024-01-13",
-  },
-  {
-    id: "CLI-006",
-    name: "Constructora Urbana S.A.S.",
-    email: "proyectos@constructoraurbana.com",
-    phone: "+57 601 234 5678",
-    city: "Bogotá",
-    address: "Carrera 11 #93-52, Of. 301",
-    orders: 45,
-    lastOrder: "2024-01-12",
-    isCompany: true,
-  },
-]
+const emptyForm = {
+  name: "",
+  email: "",
+  password: "",
+  company: "",
+  role: "user",
+}
 
 export default function ClientsPage() {
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<any>(null)
+  const [users, setUsers] = useState<UserData[]>([])
+  const [showForm, setShowForm] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    company: "",
+    role: "user",
+  })
+  const [formError, setFormError] = useState("")
 
-  const filteredClients = clients.filter(
-    (client) =>
-      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.city.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    async function loadData() {
+      const userData = await getMe()
+      if (!userData) {
+        router.push("/portal")
+        return
+      }
+      setUser(userData.user)
+      await loadUsers()
+      setLoading(false)
+    }
+    loadData()
+  }, [router])
+
+  const loadUsers = async () => {
+    try {
+      const response = await fetch("/api/users/list", { credentials: "include" })
+      const data = await response.json()
+      if (data.users) {
+        setUsers(data.users)
+      }
+    } catch (error) {
+      console.error("Error loading users:", error)
+    }
+  }
+
+  const isSuperadmin = user?.role === "superadmin" || user?.organization_id === null
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmitting(true)
+    setFormError("")
+
+    console.log("Creating user with data:", formData)
+
+    try {
+      const response = await fetch("/api/users/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      console.log("Create response:", response.status, data)
+
+      if (!response.ok) {
+        setFormError(data.error || "Error al crear usuario")
+        setSubmitting(false)
+        return
+      }
+
+      setFormData(emptyForm)
+      setShowForm(false)
+      await loadUsers()
+    } catch (error) {
+      console.error("Create user error:", error)
+      setFormError("Error de conexión")
+    }
+
+    setSubmitting(false)
+  }
+
+  const handleToggleActive = async (userData: UserData) => {
+    try {
+      const response = await fetch("/api/users/update", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id: userData.id, active: !userData.active }),
+      })
+      if (response.ok) {
+        await loadUsers()
+      }
+    } catch (error) {
+      console.error("Error toggling active:", error)
+    }
+  }
+
+  const getCompanyStyle = (orgName: string) => {
+    const normalized = orgName.toLowerCase()
+    if (normalized.includes("samsung")) return COMPANY_STYLES.samsung
+    if (normalized.includes("lg")) return COMPANY_STYLES.lg
+    if (normalized.includes("compuspar")) return COMPANY_STYLES.compuspar
+    return "border-border"
+  }
+
+  const filteredUsers = users.filter(
+    (u) =>
+      u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.organization_name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const handleLogout = () => {
     localStorage.removeItem("fermaj_session")
     router.push("/portal")
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Cargando...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -147,17 +227,33 @@ export default function ClientsPage() {
                 <li key={item.label}>
                   <Link
                     href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                      item.active
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                    }`}
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                   >
                     <item.icon className="w-5 h-5" />
                     {item.label}
                   </Link>
                 </li>
               ))}
+              {(user?.role === "superadmin" || user?.role === "admin") && (
+                <li>
+                  <Link
+                    href="/portal/dashboard/admin/orders"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  >
+                    <Shield className="w-5 h-5" />
+                    Admin
+                  </Link>
+                </li>
+              )}
+              <li>
+                <Link
+                  href="/portal/dashboard/clients"
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary"
+                >
+                  <Users className="w-5 h-5" />
+                  Clientes
+                </Link>
+              </li>
             </ul>
           </nav>
 
@@ -187,13 +283,23 @@ export default function ClientsPage() {
                 <Menu className="w-5 h-5" />
               </button>
               <h1 className="text-lg font-semibold text-foreground ml-4 lg:ml-0">
-                Clientes
+                Usuarios
               </h1>
             </div>
-            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
-              <Plus className="w-4 h-4" />
-              Nuevo Cliente
-            </Button>
+            {isSuperadmin && (
+              <Button
+                size="sm"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
+                onClick={() => {
+                  setFormData(emptyForm)
+                  setFormError("")
+                  setShowForm(true)
+                }}
+              >
+                <Plus className="w-4 h-4" />
+                Nuevo Usuario
+              </Button>
+            )}
           </div>
         </header>
 
@@ -204,7 +310,7 @@ export default function ClientsPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar por nombre, correo o ciudad..."
+                  placeholder="Buscar por nombre, email o empresa..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 bg-background border-border"
@@ -213,62 +319,239 @@ export default function ClientsPage() {
             </CardContent>
           </Card>
 
-          {/* Clients Grid */}
+          {/* Empty state */}
+          {filteredUsers.length === 0 && !searchTerm && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {COMPANIES.map((company) => (
+                <Card
+                  key={company.id}
+                  className={`bg-card border-2 ${getCompanyStyle(company.name)}`}
+                >
+                  <CardContent className="p-6 text-center">
+                    <div
+                      className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                      style={{ backgroundColor: company.color + "20" }}
+                    >
+                      <User className="w-8 h-8" style={{ color: company.color }} />
+                    </div>
+                    <h3 className="font-semibold text-foreground">{company.name}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {users.filter(
+                        (u) =>
+                          u.organization_name.toLowerCase() === company.name.toLowerCase()
+                      ).length === 0
+                        ? "Sin usuarios"
+                        : `${users.filter(
+                            (u) =>
+                              u.organization_name.toLowerCase() === company.name.toLowerCase()
+                          ).length} usuario(s)`}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Users Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filteredClients.map((client) => (
-              <Card key={client.id} className="bg-card border-border hover:border-primary/50 transition-colors">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        {client.isCompany ? (
-                          <Building className="w-6 h-6 text-primary" />
-                        ) : (
-                          <span className="text-lg font-medium text-primary">
-                            {client.name.charAt(0)}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-foreground">{client.name}</h3>
-                        <p className="text-xs text-muted-foreground">{client.id}</p>
-                      </div>
-                    </div>
-                    <button className="p-1 text-muted-foreground hover:text-foreground">
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Mail className="w-4 h-4" />
-                      <span className="truncate">{client.email}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Phone className="w-4 h-4" />
-                      <span>{client.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <MapPin className="w-4 h-4" />
-                      <span>{client.city}</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
-                    <div className="text-sm">
-                      <span className="text-primary font-medium">{client.orders}</span>
-                      <span className="text-muted-foreground"> órdenes</span>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      Ver Perfil
-                    </Button>
-                  </div>
+            {filteredUsers.length === 0 && searchTerm ? (
+              <Card className="bg-card border-border col-span-full">
+                <CardContent className="p-8 text-center">
+                  <User className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No se encontraron usuarios</p>
                 </CardContent>
               </Card>
-            ))}
+            ) : (
+              filteredUsers.map((userData) => (
+                <Card
+                  key={userData.id}
+                  className={`bg-card border-border hover:border-primary/50 transition-colors ${getCompanyStyle(
+                    userData.organization_name
+                  )}`}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-lg font-medium text-primary">
+                            {userData.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-foreground">{userData.name}</h3>
+                          <p className="text-xs text-muted-foreground">{userData.email}</p>
+                        </div>
+                      </div>
+                      <button 
+                        className={`p-1 ${isSuperadmin ? 'text-muted-foreground hover:text-foreground cursor-pointer' : 'text-muted-foreground/50 cursor-not-allowed'}`}
+                        onClick={() => isSuperadmin && handleToggleActive(userData)}
+                        title={isSuperadmin ? "Menú" : "Solo disponible para superadmin"}
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Empresa</span>
+                        <span className="font-medium">{userData.organization_name}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Rol</span>
+                        <span className="capitalize">{userData.role}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Creado</span>
+                        <span>
+                          {new Date(userData.created_at).toLocaleDateString("es-CO")}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {userData.active ? (
+                          <>
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            <span className="text-sm text-green-500">Activo</span>
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="w-4 h-4 text-red-500" />
+                            <span className="text-sm text-red-500">Inactivo</span>
+                          </>
+                        )}
+                      </div>
+                      {isSuperadmin && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleToggleActive(userData)}
+                        >
+                          {userData.active ? "Desactivar" : "Activar"}
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </main>
       </div>
+
+      {/* Create Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => {
+              setFormData(emptyForm)
+              setFormError("")
+              setShowForm(false)
+            }}
+          />
+          <Card className="relative z-10 w-full max-w-md bg-card">
+            <CardHeader>
+              <CardTitle>Crear Usuario</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleCreate} className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Nombre
+                  </label>
+                  <Input
+                    placeholder="Juan Perez"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Email
+                  </label>
+                  <Input
+                    type="email"
+                    placeholder="juan@empresa.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Contraseña
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required
+                    minLength={4}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Empresa
+                  </label>
+                  <select
+                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    required
+                  >
+                    <option value="">Seleccionar empresa</option>
+                    {COMPANIES.map((company) => (
+                      <option key={company.id} value={company.id}>
+                        {company.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Rol
+                  </label>
+                  <select
+                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground"
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  >
+                    <option value="user">Usuario</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                </div>
+                {formError && <p className="text-sm text-red-500">{formError}</p>}
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      setFormData(emptyForm)
+                      setFormError("")
+                      setShowForm(false)
+                    }}
+                    disabled={submitting}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button type="submit" className="flex-1" disabled={submitting}>
+                    {submitting ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      "Crear Usuario"
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {sidebarOpen && (
         <div

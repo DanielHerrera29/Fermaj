@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -17,135 +17,111 @@ import {
   Menu,
   X,
   Search,
-  Filter,
-  ChevronDown,
   CheckCircle,
   Clock,
   AlertCircle,
-  MapPin,
-  Phone,
-  Calendar,
-  Eye,
+  Loader2,
+  MessageSquare,
+  Shield,
 } from "lucide-react"
+import { getMe, startChatContact } from "@/app/Services/api"
+
+interface Order {
+  id: string
+  nui: string
+  client_name: string
+  client_phone: string
+  address: string
+  city: string
+  model?: string
+  service_type: string
+  description?: string
+  priority: number
+  status: string
+  organization_id: string
+  created_by: string
+  created_at: string
+  updated_at?: string
+}
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/portal/dashboard" },
   { icon: FileSpreadsheet, label: "Subir Excel", href: "/portal/dashboard/upload" },
   { icon: ClipboardList, label: "Órdenes", href: "/portal/dashboard/orders", active: true },
-  { icon: Users, label: "Clientes", href: "/portal/dashboard/clients" },
   { icon: Settings, label: "Configuración", href: "/portal/dashboard/settings" },
 ]
 
-const orders = [
-  {
-    id: "ORD-2024-001",
-    client: "María García",
-    phone: "+57 315 123 4567",
-    service: "Instalación Aire Acondicionado Samsung 12000 BTU",
-    city: "Bogotá",
-    address: "Calle 123 #45-67, Chapinero",
-    status: "completed",
-    date: "2024-01-15",
-    technician: "Juan Pérez",
-  },
-  {
-    id: "ORD-2024-002",
-    client: "Carlos López",
-    phone: "+57 310 987 6543",
-    service: "Instalación Televisor Samsung 65'' QLED",
-    city: "Medellín",
-    address: "Carrera 70 #50-30, El Poblado",
-    status: "in_progress",
-    date: "2024-01-15",
-    technician: "Pedro Ramírez",
-  },
-  {
-    id: "ORD-2024-003",
-    client: "Ana Martínez",
-    phone: "+57 320 456 7890",
-    service: "Instalación Lavadora LG 20kg",
-    city: "Cali",
-    address: "Avenida 6N #25-50, Granada",
-    status: "pending",
-    date: "2024-01-14",
-    technician: "Sin asignar",
-  },
-  {
-    id: "ORD-2024-004",
-    client: "Pedro Ramírez",
-    phone: "+57 318 234 5678",
-    service: "Mantenimiento Aire Acondicionado",
-    city: "Barranquilla",
-    address: "Calle 84 #51-20, Alto Prado",
-    status: "completed",
-    date: "2024-01-14",
-    technician: "Luis García",
-  },
-  {
-    id: "ORD-2024-005",
-    client: "Laura Sánchez",
-    phone: "+57 300 567 8901",
-    service: "Instalación Estufa a Gas Whirlpool",
-    city: "Bogotá",
-    address: "Calle 100 #15-20, Usaquén",
-    status: "in_progress",
-    date: "2024-01-13",
-    technician: "Andrés Mora",
-  },
-  {
-    id: "ORD-2024-006",
-    client: "Roberto Díaz",
-    phone: "+57 311 678 9012",
-    service: "Instalación Nevera Samsung Side by Side",
-    city: "Bucaramanga",
-    address: "Carrera 33 #48-10, Cabecera",
-    status: "pending",
-    date: "2024-01-13",
-    technician: "Sin asignar",
-  },
-]
+const ESTADO_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
+  nuevo: { label: "Nuevo", bg: "bg-gray-500/20", text: "text-gray-400" },
+  contactado: { label: "Contactado", bg: "bg-blue-500/20", text: "text-blue-400" },
+  sugerido: { label: "Sugerido", bg: "bg-purple-500/20", text: "text-purple-400" },
+  programado: { label: "Programado", bg: "bg-amber-500/20", text: "text-amber-400" },
+  cancelado: { label: "Cancelado", bg: "bg-red-500/20", text: "text-red-400" },
+}
 
 export default function OrdersPage() {
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [orders, setOrders] = useState<Order[]>([])
+  const [user, setUser] = useState<any>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [startingContact, setStartingContact] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadData() {
+      const userData = await getMe()
+      if (!userData) {
+        router.push("/portal")
+        return
+      }
+      setUser(userData.user)
+      await fetchOrders()
+      setLoading(false)
+    }
+    loadData()
+  }, [router])
+
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch("/api/orders/list", { credentials: "include" })
+      const data = await res.json()
+      if (data.orders) {
+        setOrders(data.orders)
+      }
+    } catch (err) {
+      console.error("Error fetching orders:", err)
+    }
+  }
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
-      order.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.city.toLowerCase().includes(searchTerm.toLowerCase())
+      order.client_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.nui?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.city?.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === "all" || order.status === statusFilter
     return matchesSearch && matchesStatus
   })
 
+  const canInitiateContact = (status: string) => {
+    return status === "nuevo" || status === "contactado"
+  }
+
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "completed":
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-primary/20 text-primary">
-            <CheckCircle className="w-3 h-3" />
-            Completada
-          </span>
-        )
-      case "in_progress":
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-blue-500/20 text-blue-400">
-            <Clock className="w-3 h-3" />
-            En Proceso
-          </span>
-        )
-      case "pending":
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-yellow-500/20 text-yellow-400">
-            <AlertCircle className="w-3 h-3" />
-            Pendiente
-          </span>
-        )
-      default:
-        return null
+    const config = ESTADO_CONFIG[status] || ESTADO_CONFIG.nuevo
+    return (
+      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${config.bg} ${config.text}`}>
+        {config.label}
+      </span>
+    )
+  }
+
+  const getPriorityBadge = (priority: number) => {
+    if (priority === 2) {
+      return <span className="inline-flex px-2 py-0.5 rounded-full text-xs bg-red-500/20 text-red-400">Urgente</span>
     }
+    return <span className="inline-flex px-2 py-0.5 rounded-full text-xs bg-gray-500/20 text-gray-400">Normal</span>
   }
 
   const handleLogout = () => {
@@ -153,177 +129,187 @@ export default function OrdersPage() {
     router.push("/portal")
   }
 
+  const handleStartContact = async (orderId: string) => {
+    setStartingContact(orderId)
+    try {
+      const result = await startChatContact(orderId)
+      console.log("[_orders] startChatContact result:", result)
+      if (result.success) {
+        alert("Contacto iniciado correctamente")
+        await fetchOrders()
+      } else {
+        alert(result.error || "Error al iniciar contacto")
+        console.error("Error:", result.error)
+      }
+    } catch (e) {
+      console.error("Error starting contact:", e)
+      alert("Error al iniciar contacto")
+    }
+    setStartingContact(null)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  const isSuperadmin = user?.role === "superadmin" || user?.organization_id === null
+
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 transition-transform`}>
         <div className="flex flex-col h-full">
-          <div className="p-4 border-b border-border flex items-center justify-between">
-            <Link href="/">
-              <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-4yX0MySL8JwRWLy6HNVo15DHVDqngh.png"
-                alt="Fermaj Logo"
-                width={100}
-                height={35}
-                className="h-8 w-auto"
-              />
-            </Link>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1 text-muted-foreground hover:text-foreground"
-            >
-              <X className="w-5 h-5" />
-            </button>
+          <div className="p-6 border-b border-border">
+            <Image src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-4yX0MySL8JwRWLy6HNVo15DHVDqngh.png" alt="Fermaj Logo" width={120} height={40} className="h-10 w-auto" />
           </div>
-
           <nav className="flex-1 p-4">
             <ul className="space-y-2">
               {sidebarItems.map((item) => (
                 <li key={item.label}>
-                  <Link
-                    href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                      item.active
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                    }`}
-                  >
+                  <Link href={item.href} className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${item.active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
                     <item.icon className="w-5 h-5" />
                     {item.label}
                   </Link>
                 </li>
               ))}
+              {(user?.role === "superadmin" || user?.role === "admin") && (
+                <>
+                  <li>
+                    <Link href="/portal/dashboard/admin/orders" className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+                      <Shield className="w-5 h-5" />
+                      Admin
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/portal/dashboard/clients" className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+                      <Users className="w-5 h-5" />
+                      Clientes
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </nav>
-
           <div className="p-4 border-t border-border">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full gap-2"
-              onClick={handleLogout}
-            >
-              <LogOut className="w-4 h-4" />
-              Cerrar Sesión
-            </Button>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                <span className="text-primary font-medium">{user?.name?.[0]?.toUpperCase() || "?"}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">{user?.name || "Usuario"}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.organization?.name || "Fermaj"}</p>
+              </div>
+            </div>
+            <Button variant="outline" className="w-full" onClick={handleLogout}><LogOut className="w-4 h-4 mr-2" />Cerrar Sesión</Button>
           </div>
         </div>
       </aside>
 
-      {/* Main Content */}
       <div className="flex-1 lg:ml-64">
         <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
-          <div className="flex items-center px-4 h-16">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 text-muted-foreground hover:text-foreground"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <h1 className="text-lg font-semibold text-foreground ml-4 lg:ml-0">
-              Órdenes de Instalación
-            </h1>
+          <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Órdenes de Instalación</h1>
+                <p className="text-sm text-muted-foreground">{orders.length} órdenes registradas</p>
+              </div>
+            </div>
+            <Link href="/portal/dashboard/upload">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <FileSpreadsheet className="w-4 h-4 mr-2" />
+                Nueva Carga
+              </Button>
+            </Link>
           </div>
         </header>
 
-        <main className="p-4 sm:p-6 lg:p-8">
-          {/* Filters */}
-          <Card className="bg-card border-border mb-6">
+        <main className="p-6 space-y-6">
+          <Card className="bg-card border-border">
             <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar por cliente, ID o ciudad..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9 bg-background border-border"
-                  />
+                  <Input placeholder="Buscar por cliente, NUI o ciudad..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-9 bg-background border-border" />
                 </div>
-                <div className="flex gap-2">
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="h-10 px-3 rounded-md bg-background border border-border text-foreground text-sm"
-                  >
-                    <option value="all">Todos los estados</option>
-                    <option value="pending">Pendientes</option>
-                    <option value="in_progress">En Proceso</option>
-                    <option value="completed">Completadas</option>
-                  </select>
-                </div>
+                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-10 px-3 rounded-md bg-background border border-border text-foreground text-sm">
+                  <option value="all">Todos los estados</option>
+                  <option value="nuevo">Nuevo</option>
+                  <option value="contactado">Contactado</option>
+                  <option value="sugerido">Sugerido</option>
+                  <option value="programado">Programado</option>
+                  <option value="cancelado">Cancelado</option>
+                </select>
               </div>
             </CardContent>
           </Card>
 
-          {/* Orders List */}
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-foreground">
-                {filteredOrders.length} Órdenes encontradas
-              </CardTitle>
+              <CardTitle className="text-foreground">{filteredOrders.length} Órdenes encontradas</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {filteredOrders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
-                  >
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="text-sm font-mono text-muted-foreground">
-                            {order.id}
-                          </span>
-                          {getStatusBadge(order.status)}
+              {filteredOrders.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <ClipboardList className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No hay órdenes que mostrar</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredOrders.map((order) => (
+                    <div key={order.id} className="p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors">
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="font-mono text-xs text-muted-foreground bg-background px-2 py-1 rounded">{order.nui}</span>
+                            {getStatusBadge(order.status)}
+                            {getPriorityBadge(order.priority)}
+                          </div>
+                          <h3 className="font-medium text-foreground">{order.client_name}</h3>
+                          <p className="text-sm text-muted-foreground">{order.client_phone} · {order.city}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{order.address}</p>
                         </div>
-                        <h3 className="font-medium text-foreground mb-1">
-                          {order.client}
-                        </h3>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {order.service}
-                        </p>
-                        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            {order.city}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Phone className="w-3 h-3" />
-                            {order.phone}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {order.date}
-                          </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground capitalize">{order.service_type}</span>
+                          <span className="text-xs text-muted-foreground">·</span>
+                          <span className="text-xs text-muted-foreground">{order.created_at ? new Date(order.created_at).toLocaleDateString("es-CO") : "-"}</span>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <Eye className="w-4 h-4" />
-                          Ver Detalles
-                        </Button>
+                        <div className="mt-2">
+                          {canInitiateContact(order.status) && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleStartContact(order.id)
+                              }}
+                              disabled={startingContact === order.id}
+                            >
+                              {startingContact === order.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <MessageSquare className="w-4 h-4 mr-1" />
+                              )}
+                              Iniciar contacto
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </main>
       </div>
 
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-background/80 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {sidebarOpen && <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />}
     </div>
   )
 }
